@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>متابعة الطلاب</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f7fb;
+      color: #222;
+    }
+
+    header {
+      background: #2563eb;
+      color: white;
+      padding: 25px 15px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0 0 8px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 25px auto;
+      padding: 15px;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      margin-bottom: 20px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+    }
+
+    input {
+      width: 100%;
+      padding: 13px;
+      margin: 8px 0;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      padding: 13px;
+      border: none;
+      border-radius: 10px;
+      background: #2563eb;
+      color: white;
+      font-size: 17px;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    .student {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .student:last-child {
+      border-bottom: none;
+    }
+
+    .delete {
+      width: auto;
+      background: #dc2626;
+      padding: 8px 15px;
+      margin: 0;
+    }
+
+    .empty {
+      text-align: center;
+      color: #777;
+      padding: 20px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>📚 متابعة الطلاب</h1>
+    <p>إدارة ومتابعة بيانات الطلاب بسهولة</p>
+  </header>
+
+  <div class="container">
+
+    <div class="card">
+      <h2>➕ إضافة طالب</h2>
+
+      <input
+        type="text"
+        id="studentName"
+        placeholder="اكتب اسم الطالب"
+      >
+
+      <input
+        type="text"
+        id="studentClass"
+        placeholder="اكتب الفصل أو الصف"
+      >
+
+      <button onclick="addStudent()">
+        إضافة الطالب
+      </button>
+    </div>
+
+    <div class="card">
+      <h2>👨‍🎓 قائمة الطلاب</h2>
+
+      <div id="studentsList">
+        <div class="empty">
+          لا يوجد طلاب حتى الآن
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+
+    let students = JSON.parse(
+      localStorage.getItem("students")
+    ) || [];
+
+    function saveStudents() {
+      localStorage.setItem(
+        "students",
+        JSON.stringify(students)
+      );
+    }
+
+    function addStudent() {
+
+      const name =
+        document.getElementById("studentName").value.trim();
+
+      const studentClass =
+        document.getElementById("studentClass").value.trim();
+
+      if (name === "") {
+        alert("اكتب اسم الطالب أولاً");
+        return;
+      }
+
+      students.push({
+        name: name,
+        className: studentClass
+      });
+
+      saveStudents();
+
+      document.getElementById("studentName").value = "";
+      document.getElementById("studentClass").value = "";
+
+      displayStudents();
+    }
+
+    function deleteStudent(index) {
+
+      if (confirm("هل تريد حذف هذا الطالب؟")) {
+
+        students.splice(index, 1);
+
+        saveStudents();
+
+        displayStudents();
+      }
+    }
+
+    function displayStudents() {
+
+      const list =
+        document.getElementById("studentsList");
+
+      if (students.length === 0) {
+
+        list.innerHTML =
+          '<div class="empty">لا يوجد طلاب حتى الآن</div>';
+
+        return;
+      }
+
+      list.innerHTML = "";
+
+      students.forEach((student, index) => {
+
+        const div = document.createElement("div");
+
+        div.className = "student";
+
+        div.innerHTML = 
+          <div>
+            <strong>${student.name}</strong>
+            <br>
+            <small>${student.className || "بدون فصل"}</small>
+          </div>
+
+          <button
+            class="delete"
+            onclick="deleteStudent(${index})">
+            حذف
+          </button>
+        ;
+
+        list.appendChild(div);
+      });
+    }
+    displayStudents();
+
+  </script>
+
+</body>
+</html>
