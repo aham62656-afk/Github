@@ -1,232 +1,111 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>متابعة الطلاب</title>
-
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f4f7fb;
-      color: #222;
-    }
-
-    header {
-      background: #2563eb;
-      color: white;
-      padding: 25px 15px;
-      text-align: center;
-    }
-
-    header h1 {
-      margin: 0 0 8px;
-    }
-
-    .container {
-      max-width: 900px;
-      margin: 25px auto;
-      padding: 15px;
-    }
-
-    .card {
-      background: white;
-      padding: 20px;
-      border-radius: 15px;
-      margin-bottom: 20px;
-      box-shadow: 0 3px 12px rgba(0,0,0,0.08);
-    }
-
-    input {
-      width: 100%;
-      padding: 13px;
-      margin: 8px 0;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      font-size: 16px;
-    }
-
-    button {
-      width: 100%;
-      padding: 13px;
-      border: none;
-      border-radius: 10px;
-      background: #2563eb;
-      color: white;
-      font-size: 17px;
-      cursor: pointer;
-      margin-top: 8px;
-    }
-
-    button:hover {
-      background: #1d4ed8;
-    }
-
-    .student {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 15px;
-      border-bottom: 1px solid #eee;
-    }
-
-    .student:last-child {
-      border-bottom: none;
-    }
-
-    .delete {
-      width: auto;
-      background: #dc2626;
-      padding: 8px 15px;
-      margin: 0;
-    }
-
-    .empty {
-      text-align: center;
-      color: #777;
-      padding: 20px;
-    }
-  </style>
-</head>
-
-<body>
-
-  <header>
-    <h1>📚 متابعة الطلاب</h1>
-    <p>إدارة ومتابعة بيانات الطلاب بسهولة</p>
-  </header>
-
-  <div class="container">
-
-    <div class="card">
-      <h2>➕ إضافة طالب</h2>
-
-      <input
-        type="text"
-        id="studentName"
-        placeholder="اكتب اسم الطالب"
-      >
-
-      <input
-        type="text"
-        id="studentClass"
-        placeholder="اكتب الفصل أو الصف"
-      >
-
-      <button onclick="addStudent()">
-        إضافة الطالب
-      </button>
-    </div>
-
-    <div class="card">
-      <h2>👨‍🎓 قائمة الطلاب</h2>
-
-      <div id="studentsList">
-        <div class="empty">
-          لا يوجد طلاب حتى الآن
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <script>
-
-    let students = JSON.parse(
-      localStorage.getItem("students")
-    ) || [];
-
-    function saveStudents() {
-      localStorage.setItem(
-        "students",
-        JSON.stringify(students)
-      );
-    }
-
-    function addStudent() {
-
-      const name =
-        document.getElementById("studentName").value.trim();
-
-      const studentClass =
-        document.getElementById("studentClass").value.trim();
-
-      if (name === "") {
-        alert("اكتب اسم الطالب أولاً");
+if (!name || !phone) {
+        alert("يرجى إدخال اسم الطالب ورقم هاتف ولي الأمر!");
         return;
       }
 
+      phone = phone.replace(/[^0-9]/g, '');
+
       students.push({
+        id: Date.now(),
         name: name,
-        className: studentClass
+        className: studentClass || "عام",
+        phone: phone
       });
 
       saveStudents();
 
       document.getElementById("studentName").value = "";
       document.getElementById("studentClass").value = "";
+      document.getElementById("parentPhone").value = "";
 
       displayStudents();
     }
 
     function deleteStudent(index) {
-
-      if (confirm("هل تريد حذف هذا الطالب؟")) {
-
+      if (confirm("هل أنت تأكد من حذف هذا الطالب؟")) {
         students.splice(index, 1);
-
         saveStudents();
-
         displayStudents();
       }
     }
 
-    function displayStudents() {
+    function sendWhatsApp(phone, message) {
+      const url = https://wa.me/${phone}?text=${encodeURIComponent(message)};
+      window.open(url, '_blank');
+    }
 
-      const list =
-        document.getElementById("studentsList");
+    function sendEntry(index) {
+      const s = students[index];
+      const time = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+      const msg = السلام عليكم ولي أمر الطالب/ة: ${s.name}\n\nنحيطكم علماً بوصول الطالب ودخوله الحصة بنجاح الساعة: ${time} ⏰.;
+      sendWhatsApp(s.phone, msg);
+    }
+
+    function sendExit(index) {
+      const s = students[index];
+      const time = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+      const msg = السلام عليكم ولي أمر الطالب/ة: ${s.name}\n\nنحيطكم علماً بأن الطالب قد غادر الحصة الان الساعة: ${time} 🏃‍♂️.;
+      sendWhatsApp(s.phone, msg);
+    }
+
+    function sendExamGrade(index) {
+      const examName = document.getElementById(exam-${index}).value.trim();
+      const grade = document.getElementById(grade-${index}).value.trim();
+      const maxGrade = document.getElementById(max-${index}).value.trim();
+
+      if (!examName  !grade  !maxGrade) {
+        alert("يرجى كتابة اسم الاختبار، الدرجة، والدرجة النهائية!");
+        return;
+      }
+
+      const s = students[index];
+      const msg = السلام عليكم ولي أمر الطالب/ة: ${s.name}\n\n📊 نتيجة ${examName}:\nحصل الطالب على: ${grade} من ${maxGrade}.\n\nشاكرين اهتمامكم ومتابعتكم.;
+      
+      sendWhatsApp(s.phone, msg);
+    }
+
+    function displayStudents() {
+      const list = document.getElementById("studentsList");
 
       if (students.length === 0) {
-
-        list.innerHTML =
-          '<div class="empty">لا يوجد طلاب حتى الآن</div>';
-
+        list.innerHTML = '<div class="empty">لا يوجد طلاب مسجلون حتى الآن</div>';
         return;
       }
 
       list.innerHTML = "";
 
       students.forEach((student, index) => {
-
         const div = document.createElement("div");
-
-        div.className = "student";
+        div.className = "student-card";
 
         div.innerHTML = 
-          <div>
-            <strong>${student.name}</strong>
-            <br>
-            <small>${student.className || "بدون فصل"}</small>
+          <div class="student-header">
+            <div class="student-info">
+              <h3>${student.name}</h3>
+              <p>الصف: ${student.className} | رقم ولي الأمر: ${student.phone}</p>
+            </div>
+            <button class="btn btn-delete" onclick="deleteStudent(${index})">حذف</button>
           </div>
 
-          <button
-            class="delete"
-            onclick="deleteStudent(${index})">
-            حذف
-          </button>
+          <div class="actions-grid">
+            <button class="btn btn-in" onclick="sendEntry(${index})">📲 إشعار دخول</button>
+            <button class="btn btn-out" onclick="sendExit(${index})">📲 إشعار خروج</button>
+          </div>
+
+          <div class="grade-input-group">
+            <input type="text" id="exam-${index}" placeholder="اسم الاختبار (مثال: الشهر)">
+            <input type="number" id="grade-${index}" placeholder="الدرجة" style="width: 80px;">
+            <input type="number" id="max-${index}" placeholder="من" style="width: 80px;">
+            <button class="btn btn-grade" onclick="sendExamGrade(${index})">إرسال الدرجة</button>
+          </div>
         ;
 
         list.appendChild(div);
       });
     }
-    displayStudents();
 
+    displayStudents();
   </script>
 
 </body>
-</html>
+              </html>
