@@ -1,189 +1,507 @@
-list.innerHTML =
-          <div class="empty">
-            لا يوجد طلاب مسجلون حتى الآن
-          </div>;
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
 
-        return;
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>إدارة كارنيهات الطلاب</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, Tahoma, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: #f1f5f9;
+    }
+
+    header {
+      background: #1565c0;
+      color: white;
+      text-align: center;
+      padding: 25px 15px;
+    }
+
+    header h1 {
+      margin: 0 0 8px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 15px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,.08);
+    }
+
+    h2 {
+      color: #1565c0;
+      margin-top: 0;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      margin-bottom: 12px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+      margin-top: 5px;
+    }
+
+    .create {
+      background: #1565c0;
+    }
+
+    .download {
+      background: #159447;
+    }
+
+    .delete {
+      background: #d63031;
+    }
+
+    .student-card {
+      border: 1px solid #ddd;
+      border-radius: 14px;
+      padding: 18px;
+      margin-top: 15px;
+      text-align: center;
+    }
+
+    .student-card h3 {
+      margin: 0 0 8px;
+      font-size: 22px;
+    }
+
+    .student-card p {
+      margin: 6px 0;
+      color: #555;
+    }
+
+    .qr {
+      display: flex;
+      justify-content: center;
+      margin: 18px 0;
+    }
+
+    .id {
+      font-weight: bold;
+      color: #1565c0;
+    }
+
+    .card-print {
+      background: white;
+      border: 2px solid #1565c0;
+      border-radius: 15px;
+      padding: 20px;
+      max-width: 350px;
+      margin: 20px auto;
+      text-align: center;
+    }
+
+    @media print {
+      body * {
+        visibility: hidden;
       }
 
+      .print-area,
+      .print-area * {
+        visibility: visible;
+      }
 
-      list.innerHTML = "";
+      .print-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
 
+<body>
 
-      students.forEach(
-        (student, index) => {
+<header>
+  <h1>🎓 نظام كارنيهات الطلاب</h1>
+  <p>إنشاء QR Code خاص بكل طالب</p>
+</header>
 
-          const div =
-            document.createElement("div");
+<div class="container">
 
+  <div class="card">
 
-          div.className =
-            "student-card";
+    <h2>➕ إضافة طالب</h2>
 
+    <input
+      id="studentName"
+      type="text"
+      placeholder="اسم الطالب"
+    >
 
-          let lastAction = "";
+    <input
+      id="parentPhone"
+      type="tel"
+      placeholder="رقم واتساب ولي الأمر"
+    >
 
+    <input
+      id="studentClass"
+      type="text"
+      value="سنة سادسة ابتدائي"
+      placeholder="المرحلة"
+    >
 
-          if (student.entryTime) {
+    <button
+      class="create"
+      onclick="createStudent()"
+    >
+      إنشاء كارنيه و QR الطالب
+    </button>
 
-            lastAction +=
-              🟢 آخر دخول: ${student.entryTime}<br>;
-
-          }
-
-
-          if (student.exitTime) {
-
-            lastAction +=
-              🟠 آخر خروج: ${student.exitTime};
-
-          }
-
-
-          div.innerHTML = 
-
-            <div class="student-header">
-
-              <div class="student-info">
-
-                <h3>
-                  👨‍🎓 ${student.name}
-                </h3>
-
-                <p>
-                  📚 الصف:
-                  ${student.className}
-                  <br>
-
-                  📱 ولي الأمر:
-                  ${student.phone}
-                </p>
-
-              </div>
-
-
-              <button
-                class="btn btn-delete"
-                onclick="deleteStudent(${index})"
-              >
-                حذف
-              </button>
-
-            </div>
+  </div>
 
 
-            <div class="actions-grid">
+  <div class="card">
 
-              <button
-                class="btn btn-in"
-                onclick="sendEntry(${index})"
-              >
-                📲 تسجيل دخول
-              </button>
+    <h2>👨‍🎓 الطلاب</h2>
 
+    <div id="studentsList">
+      لا يوجد طلاب حتى الآن
+    </div>
 
-              <button
-                class="btn btn-out"
-                onclick="sendExit(${index})"
-              >
-                📲 تسجيل خروج
-              </button>
+  </div>
 
-            </div>
+</div>
 
 
-            ${
-              lastAction
-              ?
-              <div class="last-action">
-                ${lastAction}
-              </div>
-              :
-              ""
-            }
+<script>
+
+  let students =
+    JSON.parse(
+      localStorage.getItem("students")
+    ) || [];
 
 
-            <br>
+  function formatPhone(phone) {
+
+    phone =
+      phone.replace(/\D/g, "");
+
+    if (phone.startsWith("01")) {
+
+      phone =
+        "20" +
+        phone.substring(1);
+
+    }
+
+    return phone;
+  }
 
 
-            <div class="grade-input-group">
+  function saveStudents() {
 
-              <input
-                type="text"
-                id="exam-${index}"
-                placeholder="اسم الامتحان"
-              >
+    localStorage.setItem(
+      "students",
+      JSON.stringify(students)
+    );
 
-
-              <input
-                type="number"
-                id="grade-${index}"
-                placeholder="الدرجة"
-                min="0"
-              >
+  }
 
 
-              <input
-                type="number"
-                id="max-${index}"
-                placeholder="من"
-                min="1"
-              >
+  function createStudent() {
+
+    const name =
+      document
+        .getElementById("studentName")
+        .value
+        .trim();
 
 
-              <button
-                class="btn btn-grade"
-                onclick="sendExamGrade(${index})"
-              >
-                📊 إرسال الدرجة
-              </button>
-
-            </div>
-
-          ;
+    const phone =
+      document
+        .getElementById("parentPhone")
+        .value
+        .trim();
 
 
-          list.appendChild(div);
+    const studentClass =
+      document
+        .getElementById("studentClass")
+        .value
+        .trim();
 
-        }
-      );
+
+    if (!name) {
+
+      alert("اكتب اسم الطالب");
+
+      return;
     }
 
 
-    // =========================
-    // تحديث الإحصائيات
-    // =========================
+    if (!phone) {
 
-    function updateStats() {
+      alert("اكتب رقم واتساب ولي الأمر");
 
-      document.getElementById(
-        "studentsCount"
-      ).textContent =
-        students.length;
-
-
-      document.getElementById(
-        "entriesCount"
-      ).textContent =
-        entriesCount;
-
-
-      document.getElementById(
-        "exitsCount"
-      ).textContent =
-        exitsCount;
+      return;
     }
+            const id =
+      "STU-" +
+      Date.now();
 
 
-    // =========================
-    // تشغيل التطبيق
-    // =========================
+    const student = {
+
+      id: id,
+
+      name: name,
+
+      className:
+        studentClass ||
+        "سنة سادسة ابتدائي",
+
+      phone:
+        formatPhone(phone)
+
+    };
+
+
+    students.push(student);
+
+    saveStudents();
+
+
+    document.getElementById(
+      "studentName"
+    ).value = "";
+
+
+    document.getElementById(
+      "parentPhone"
+    ).value = "";
+
 
     displayStudents();
 
-    updateStats();
+    alert(
+      "تم إنشاء كارنيه الطالب بنجاح ✅"
+    );
 
-  </script>
+  }
+
+
+  function displayStudents() {
+
+    const list =
+      document.getElementById(
+        "studentsList"
+      );
+
+
+    if (students.length === 0) {
+
+      list.innerHTML =
+        "<p>لا يوجد طلاب حتى الآن</p>";
+
+      return;
+
+    }
+
+
+    list.innerHTML = "";
+
+
+    students.forEach(
+      function(student, index) {
+
+        const card =
+          document.createElement(
+            "div"
+          );
+
+
+        card.className =
+          "student-card";
+
+
+        card.innerHTML = 
+
+          <div
+            class="print-area"
+            id="print-${index}"
+          >
+
+            <div class="card-print">
+
+              <h3>
+                🎓 كارنيه الطالب
+              </h3>
+
+              <h3>
+                ${student.name}
+              </h3>
+
+              <p>
+                📚 ${student.className}
+              </p>
+
+              <p class="id">
+                🆔 ${student.id}
+              </p>
+
+              <div
+                class="qr"
+                id="qr-${index}"
+              ></div>
+
+              <p>
+                امسح الكود لتسجيل الحضور
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <button
+            class="download"
+            onclick="printCard(${index})"
+          >
+            🖨️ طباعة الكارنيه
+          </button>
+
+
+          <button
+            class="delete"
+            onclick="deleteStudent(${index})"
+          >
+            🗑️ حذف الطالب
+          </button>
+
+        ;
+
+
+        list.appendChild(card);
+
+
+        const qrData =
+          "STUDENT|" +
+          student.id +
+          "|" +
+          student.name +
+          "|" +
+          student.className +
+          "|" +
+          student.phone;
+
+
+        new QRCode(
+          document.getElementById(
+            "qr-" + index
+          ),
+          {
+
+            text: qrData,
+
+            width: 180,
+
+            height: 180,
+
+            correctLevel:
+              QRCode.CorrectLevel.H
+
+          }
+        );
+
+      }
+    );
+
+  }
+
+
+  function printCard(index) {
+
+    const card =
+      document.getElementById(
+        "print-" + index
+      );
+
+
+    const original =
+      document.body.innerHTML;
+
+
+    document.body.innerHTML =
+      card.outerHTML;
+
+
+    window.print();
+
+
+    document.body.innerHTML =
+      original;
+
+
+    displayStudents();
+
+  }
+
+
+  function deleteStudent(index) {
+
+    const answer =
+      confirm(
+        "هل تريد حذف هذا الطالب؟"
+      );
+
+
+    if (!answer) {
+
+      return;
+
+    }
+
+
+    students.splice(
+      index,
+      1
+    );
+
+
+    saveStudents();
+
+    displayStudents();
+
+  }
+
+
+  displayStudents();
+
+</script>
 
 </body>
 
