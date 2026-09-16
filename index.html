@@ -1,111 +1,190 @@
-if (!name || !phone) {
-        alert("يرجى إدخال اسم الطالب ورقم هاتف ولي الأمر!");
+list.innerHTML =
+          <div class="empty">
+            لا يوجد طلاب مسجلون حتى الآن
+          </div>;
+
         return;
       }
 
-      phone = phone.replace(/[^0-9]/g, '');
-
-      students.push({
-        id: Date.now(),
-        name: name,
-        className: studentClass || "عام",
-        phone: phone
-      });
-
-      saveStudents();
-
-      document.getElementById("studentName").value = "";
-      document.getElementById("studentClass").value = "";
-      document.getElementById("parentPhone").value = "";
-
-      displayStudents();
-    }
-
-    function deleteStudent(index) {
-      if (confirm("هل أنت تأكد من حذف هذا الطالب؟")) {
-        students.splice(index, 1);
-        saveStudents();
-        displayStudents();
-      }
-    }
-
-    function sendWhatsApp(phone, message) {
-      const url = https://wa.me/${phone}?text=${encodeURIComponent(message)};
-      window.open(url, '_blank');
-    }
-
-    function sendEntry(index) {
-      const s = students[index];
-      const time = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
-      const msg = السلام عليكم ولي أمر الطالب/ة: ${s.name}\n\nنحيطكم علماً بوصول الطالب ودخوله الحصة بنجاح الساعة: ${time} ⏰.;
-      sendWhatsApp(s.phone, msg);
-    }
-
-    function sendExit(index) {
-      const s = students[index];
-      const time = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
-      const msg = السلام عليكم ولي أمر الطالب/ة: ${s.name}\n\nنحيطكم علماً بأن الطالب قد غادر الحصة الان الساعة: ${time} 🏃‍♂️.;
-      sendWhatsApp(s.phone, msg);
-    }
-
-    function sendExamGrade(index) {
-      const examName = document.getElementById(exam-${index}).value.trim();
-      const grade = document.getElementById(grade-${index}).value.trim();
-      const maxGrade = document.getElementById(max-${index}).value.trim();
-
-      if (!examName  !grade  !maxGrade) {
-        alert("يرجى كتابة اسم الاختبار، الدرجة، والدرجة النهائية!");
-        return;
-      }
-
-      const s = students[index];
-      const msg = السلام عليكم ولي أمر الطالب/ة: ${s.name}\n\n📊 نتيجة ${examName}:\nحصل الطالب على: ${grade} من ${maxGrade}.\n\nشاكرين اهتمامكم ومتابعتكم.;
-      
-      sendWhatsApp(s.phone, msg);
-    }
-
-    function displayStudents() {
-      const list = document.getElementById("studentsList");
-
-      if (students.length === 0) {
-        list.innerHTML = '<div class="empty">لا يوجد طلاب مسجلون حتى الآن</div>';
-        return;
-      }
 
       list.innerHTML = "";
 
-      students.forEach((student, index) => {
-        const div = document.createElement("div");
-        div.className = "student-card";
 
-        div.innerHTML = 
-          <div class="student-header">
-            <div class="student-info">
-              <h3>${student.name}</h3>
-              <p>الصف: ${student.className} | رقم ولي الأمر: ${student.phone}</p>
+      students.forEach(
+        (student, index) => {
+
+          const div =
+            document.createElement("div");
+
+
+          div.className =
+            "student-card";
+
+
+          let lastAction = "";
+
+
+          if (student.entryTime) {
+
+            lastAction +=
+              🟢 آخر دخول: ${student.entryTime}<br>;
+
+          }
+
+
+          if (student.exitTime) {
+
+            lastAction +=
+              🟠 آخر خروج: ${student.exitTime};
+
+          }
+
+
+          div.innerHTML = 
+
+            <div class="student-header">
+
+              <div class="student-info">
+
+                <h3>
+                  👨‍🎓 ${student.name}
+                </h3>
+
+                <p>
+                  📚 الصف:
+                  ${student.className}
+                  <br>
+
+                  📱 ولي الأمر:
+                  ${student.phone}
+                </p>
+
+              </div>
+
+
+              <button
+                class="btn btn-delete"
+                onclick="deleteStudent(${index})"
+              >
+                حذف
+              </button>
+
             </div>
-            <button class="btn btn-delete" onclick="deleteStudent(${index})">حذف</button>
-          </div>
 
-          <div class="actions-grid">
-            <button class="btn btn-in" onclick="sendEntry(${index})">📲 إشعار دخول</button>
-            <button class="btn btn-out" onclick="sendExit(${index})">📲 إشعار خروج</button>
-          </div>
 
-          <div class="grade-input-group">
-            <input type="text" id="exam-${index}" placeholder="اسم الاختبار (مثال: الشهر)">
-            <input type="number" id="grade-${index}" placeholder="الدرجة" style="width: 80px;">
-            <input type="number" id="max-${index}" placeholder="من" style="width: 80px;">
-            <button class="btn btn-grade" onclick="sendExamGrade(${index})">إرسال الدرجة</button>
-          </div>
-        ;
+            <div class="actions-grid">
 
-        list.appendChild(div);
-      });
+              <button
+                class="btn btn-in"
+                onclick="sendEntry(${index})"
+              >
+                📲 تسجيل دخول
+              </button>
+
+
+              <button
+                class="btn btn-out"
+                onclick="sendExit(${index})"
+              >
+                📲 تسجيل خروج
+              </button>
+
+            </div>
+
+
+            ${
+              lastAction
+              ?
+              <div class="last-action">
+                ${lastAction}
+              </div>
+              :
+              ""
+            }
+
+
+            <br>
+
+
+            <div class="grade-input-group">
+
+              <input
+                type="text"
+                id="exam-${index}"
+                placeholder="اسم الامتحان"
+              >
+
+
+              <input
+                type="number"
+                id="grade-${index}"
+                placeholder="الدرجة"
+                min="0"
+              >
+
+
+              <input
+                type="number"
+                id="max-${index}"
+                placeholder="من"
+                min="1"
+              >
+
+
+              <button
+                class="btn btn-grade"
+                onclick="sendExamGrade(${index})"
+              >
+                📊 إرسال الدرجة
+              </button>
+
+            </div>
+
+          ;
+
+
+          list.appendChild(div);
+
+        }
+      );
     }
 
+
+    // =========================
+    // تحديث الإحصائيات
+    // =========================
+
+    function updateStats() {
+
+      document.getElementById(
+        "studentsCount"
+      ).textContent =
+        students.length;
+
+
+      document.getElementById(
+        "entriesCount"
+      ).textContent =
+        entriesCount;
+
+
+      document.getElementById(
+        "exitsCount"
+      ).textContent =
+        exitsCount;
+    }
+
+
+    // =========================
+    // تشغيل التطبيق
+    // =========================
+
     displayStudents();
+
+    updateStats();
+
   </script>
 
 </body>
-              </html>
+
+</html>
